@@ -1,0 +1,11 @@
+{
+  "name": "patchdrop-rest-api",
+  "version": "1.0.0",
+  "description": "PatchDrop Rest API",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "FalkenDev",
+  "license": "MIT"
+}
