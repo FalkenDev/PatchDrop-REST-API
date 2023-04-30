@@ -13,7 +13,7 @@ const nameSchema = new Schema({
 });
 
 const addressSchema = new Schema({
-  adreess: String,
+  address: String,
   postalCode: Number,
   place: String,
   country: String,
@@ -64,11 +64,68 @@ const payoutSchema = new Schema({
 });
 
 const dropSchema = new Schema({
-  products: { dropProductSchema },
+  products: {
+    type: Schema.Types.ObjectId,
+    ref: "BidProduct",
+  },
   totalPrice: Number,
   createdAt: Date,
   user: mongoose.SchemaTypes.ObjectId,
-  payment: {},
+  paymentMethod: String,
+  delivery: { deliverySchema },
+});
+
+const bidSchema = new Schema({
+  products: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "DropProduct",
+    },
+  ],
+  totalPrice: Number,
+  createdAt: Date,
+  user: mongoose.SchemaTypes.ObjectId,
+  paymentMethod: String,
+  delivery: { deliverySchema },
+});
+
+const deliverySchema = new Schema({
+  deliveryAddress: {
+    name: {
+      type: String,
+      required: true,
+    },
+    place: {
+      type: String,
+      required: true,
+    },
+    postalCode: {
+      type: Number,
+      required: true,
+    },
+    country: {
+      type: String,
+      required: true,
+    },
+  },
+  invoicingAddress: {
+    name: {
+      type: String,
+      required: true,
+    },
+    place: {
+      type: String,
+      required: true,
+    },
+    postalCode: {
+      type: Number,
+      required: true,
+    },
+    country: {
+      type: String,
+      required: true,
+    },
+  },
 });
 
 // Main schema
@@ -91,8 +148,15 @@ const userSchema = new Schema(
       required: true,
     },
     name: nameSchema,
-    gender: String,
-    phoneNumber: String,
+    gender: {
+      type: String,
+      required: true,
+      enum: ["Man", "Kvinna", "ickebinär", "annat"],
+    },
+    phoneNumber: {
+      type: String,
+      required: false,
+    },
     email: {
       type: String,
       required: true,
@@ -104,19 +168,19 @@ const userSchema = new Schema(
     address: addressSchema,
     drops: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "DropProduct",
       },
     ],
     biddings: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "BidProduct",
       },
     ],
     posts: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Post",
       },
     ],
@@ -136,18 +200,30 @@ const userSchema = new Schema(
       },
     },
     payment: {
-      payment_type: String,
-      provider: String,
-      account_no: Number,
-      expiry: Date,
+      payment_type: {
+        type: String,
+        required: false,
+      },
+      provider: {
+        type: String,
+        required: false,
+      },
+      account_no: {
+        type: String,
+        required: false,
+      },
+      expiry: {
+        type: String,
+        required: false,
+      },
     },
     reviews: {},
     generalInfo: {},
     orderHistory: {
-      drops: [dropSchema],
-      biddings: [],
+      dropProducts: [dropSchema],
+      bidProducts: [bidSchema],
     },
-    lastLogedIn: {},
+    lastLogedIn: Date,
     credit: { type: Number, default: 0 },
     isAdmin: { type: Boolean, default: false },
   },
