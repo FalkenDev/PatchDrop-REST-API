@@ -1,30 +1,140 @@
 import mongoose from "mongoose";
-import { ObjectId } from "mongoose";
-const { Schema } = mongoose;
+const { model, Schema } = mongoose;
 
+const nameSchema = new Schema({
+  first: {
+    type: String,
+    required: true,
+  },
+  last: {
+    type: String,
+    required: true,
+  },
+});
+
+const addressSchema = new Schema({
+  adreess: String,
+  postalCode: Number,
+  place: String,
+  country: String,
+});
+
+const noticeSchema = new Schema({
+  activeDevice: {
+    type: Boolean,
+    default: true,
+  },
+  buyer: {
+    bidsWon: {
+      type: Boolean,
+      default: true,
+    },
+    overBid: {
+      type: Boolean,
+      default: true,
+    },
+    whishListEnd: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  seller: {
+    firstBid: {
+      type: Boolean,
+      default: true,
+    },
+    forAllBid: {
+      type: Boolean,
+      default: true,
+    },
+    soldPatch: {
+      type: Boolean,
+      default: true,
+    },
+    paymentConfirm: {
+      type: Boolean,
+      default: true,
+    },
+  },
+});
+
+const payoutSchema = new Schema({
+  bankTransfer: {},
+  paypal: {},
+});
+
+const dropSchema = new Schema({
+  products: { dropProductSchema },
+  totalPrice: Number,
+  createdAt: Date,
+  user: mongoose.SchemaTypes.ObjectId,
+  payment: {},
+});
+
+// Main schema
 const userSchema = new Schema(
   {
-    googleId: String,
-    facebookId: String,
-    username: { type: String, required: true },
-    name: {
-      first: String,
-      last: String,
+    googleId: {
+      type: String,
+      default: null,
     },
+    facebookId: {
+      type: String,
+      default: null,
+    },
+    profileImage: {
+      type: String,
+      default: null,
+    },
+    username: {
+      type: String,
+      required: true,
+    },
+    name: nameSchema,
     gender: String,
     phoneNumber: String,
-    email: String,
-    password: String,
-    address: {
-      adreess: String,
-      postalCode: Number,
-      place: String,
-      country: String,
+    email: {
+      type: String,
+      required: true,
     },
-    drops: {},
-    biddings: {},
-    posts: {},
-    settings: {},
+    password: {
+      type: String,
+      required: true,
+    },
+    address: addressSchema,
+    drops: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "DropProduct",
+      },
+    ],
+    biddings: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "BidProduct",
+      },
+    ],
+    posts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Post",
+      },
+    ],
+    settings: {
+      notices: noticeSchema,
+      security: {},
+      payout: payoutSchema,
+      language: {
+        type: String,
+        required: true,
+        default: "Svenska",
+      },
+      currency: {
+        type: String,
+        required: true,
+        default: "kronor",
+      },
+    },
     payment: {
       payment_type: String,
       provider: String,
@@ -34,32 +144,16 @@ const userSchema = new Schema(
     reviews: {},
     generalInfo: {},
     orderHistory: {
-      drops: [
-        {
-          products: {},
-          totalPrice: Number,
-          createdAt: Number,
-          user: {},
-          payment: {},
-        },
-      ],
+      drops: [dropSchema],
       biddings: [],
     },
     lastLogedIn: {},
-    updatedAt: Date,
-    createdAt: Date,
+    credit: { type: Number, default: 0 },
+    isAdmin: { type: Boolean, default: false },
   },
   {
-    virtuals: {
-      fullName: {
-        get() {
-          return this.name.first + " " + this.name.last;
-        },
-        set(v) {
-          this.name.first = v.substr(0, v.indexOf(" "));
-          this.name.last = v.substr(v.indexOf(" ") + 1);
-        },
-      },
-    },
+    timestamps: true,
   }
 );
+
+module.exports = model("User", userSchema);
