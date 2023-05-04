@@ -88,4 +88,5 @@ const bidProductSchema = new Schema(
   }
 );
 
+moongose.model("BidProduct", bidProductSchema);
 module.exports = model("BidProduct", bidProductSchema);

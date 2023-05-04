@@ -232,4 +232,6 @@ const userSchema = new Schema(
   }
 );
 
+
+moongose.model("User", userSchema);
 module.exports = model("User", userSchema);

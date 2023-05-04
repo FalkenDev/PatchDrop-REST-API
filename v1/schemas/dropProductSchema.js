@@ -105,4 +105,5 @@ const dropProductSchema = new Schema(
   }
 );
 
+moongose.model("DropProduct", dropProductSchema);
 module.exports = model("DropProduct", dropProductSchema);
